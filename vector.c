@@ -6,9 +6,9 @@
 #endif
 
 int main (void) {
-    int32_t **vec1Contents = build2dArr(1,2);
-    vec1Contents[0][0] = 3;
-    vec1Contents[0][1] = 4;
-    vec32 *vec1 = initVec(vec1Contents,1,2);
-    printf("%d\n",magnitude(vec1));
+   vec32 *id1 = initIdentity(5);
+   int32_t **a2 = init2dArr(5,5);
+   a2[1][1] = 5;
+   vec32 *vec2 = initVec(a2,5,5);
+   printVec(multiply(id1,vec2));
 }
