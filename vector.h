@@ -1,26 +1,26 @@
 #include <stdlib.h>
 #include <math.h>
-#define arrLen(arr) (int)(sizeof(arr)/(sizeof(int32_t)))
-//TODO: NEED TO CONVERT FROM INT32_T TO DOUBLE.
+#define arrLen(arr) (int)(sizeof(arr)/(sizeof(double)))
+
 typedef struct vec32 {
-    int32_t **contents;
+    double **contents;
     int rows;
     int cols;
 } vec32;
 
-int32_t** init2dArr(size_t rows, size_t cols) {
+double** init2dArr(size_t rows, size_t cols) {
     if (rows <= 0 || cols <= 0) {
         printf("Rows and Cols must be positive numbers");
         exit(1);
     }
-    int32_t **retArr = (int32_t **)(malloc(sizeof(int32_t *) * cols));
+    double **retArr = (double **)(malloc(sizeof(double *) * cols));
     // init cols
     for (int k = 0; k < cols; k++) {
-        retArr[k] = (int32_t *)(malloc(rows * sizeof(int32_t)));
+        retArr[k] = (double *)(malloc(rows * sizeof(double)));
     }
     // set values to 0
     for (int i = 0; i < cols; i++) {
-        int32_t *row = retArr[i];
+        double *row = retArr[i];
         for (int j = 0; j < rows; j++) {
             row[j] = 0;
         }
@@ -28,7 +28,7 @@ int32_t** init2dArr(size_t rows, size_t cols) {
     return retArr;
 }
 
-vec32* initVec(int32_t **data, size_t rows, size_t cols) {
+vec32* initVec(double **data, size_t rows, size_t cols) {
     vec32 *retVec = (vec32*)(malloc(sizeof(vec32)));
     retVec->contents = data;
     retVec->rows = (int)rows;
@@ -50,10 +50,10 @@ vec32* copyVec(vec32* in) {
 
 vec32* initIdentity (size_t dimension) {
     vec32* retVec = (vec32*)(malloc(sizeof(vec32)));
-    int32_t** contents = init2dArr(dimension,dimension);
+    double** contents = init2dArr(dimension,dimension);
     // set values on diagonals
     for (int i = 0; i<dimension; i++) {
-        int32_t* row = contents[i];
+        double* row = contents[i];
         for (int j = 0; j<dimension; j++) {
             row[j] = (j == i) ? 1 : 0;
         }
@@ -68,7 +68,7 @@ vec32* initIdentity (size_t dimension) {
 void printVec(vec32* vec) {
     for (int i = 0; i<vec->cols; i++) {
         for (int j = 0; j<vec->rows; j++) {
-            printf("%d ",vec->contents[i][j]);
+            printf("%f ",vec->contents[i][j]);
         }
         printf("\n");
     }
@@ -87,7 +87,7 @@ double magnitude(vec32* vec) {
     return sqrt(((double) product));
 }
 
-void scalarMultiply(vec32* vec, int32_t scalar) {
+void scalarMultiply(vec32* vec, double scalar) {
     for (int i =0; i< vec->rows; i++) {
         for (int j = 0; vec->cols; j++) {
             vec->contents[i][j] *= scalar;
@@ -95,13 +95,13 @@ void scalarMultiply(vec32* vec, int32_t scalar) {
     }
 }
 
-int32_t dotProduct(vec32* vec1, vec32* vec2) {
+double dotProduct(vec32* vec1, vec32* vec2) {
     if (vec1->cols != vec2->cols || vec1->rows != vec2->rows) {
         fprintf(stderr,"Incompatible vectors\n");
         exit(1);
     }
 
-    int32_t product = 0;
+    double product = 0;
     for (int i = 0; i<vec1->cols; i++) {
         for (int j = 0; j<vec1->rows; j++) {
             product += (vec1->contents[i][j]) * (vec2->contents[i][j]);
@@ -157,12 +157,12 @@ vec32* vectorProject(vec32* vec1, vec32* vec2) {
         exit(1);
     }
 
-    vec32* vec1Copy = copy(vec1);
+    vec32* vec1Copy = copyVec(vec1);
     
-    int32_t vec1DotVec2 = dotProduct(vec1,vec2);
+    double vec1DotVec2 = dotProduct(vec1,vec2);
     double vec1Squared  = magnitude(vec1);
     vec1Squared = vec1Squared*vec1Squared;
-    int32_t projectionScalar = vec1DotVec2/vec1Squared;
+    double projectionScalar = vec1DotVec2/vec1Squared;
     scalarMultiply(vec1Copy, projectionScalar);
 
     return vec1Copy;
