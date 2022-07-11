@@ -1,4 +1,2 @@
 # vectors
-simple c vectors library
-
-this is a toy project, created for my own uses.
+simple c vectors library that does all that one would learn in a first level linear algebra class.
