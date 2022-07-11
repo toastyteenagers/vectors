@@ -164,7 +164,6 @@ vec32* vectorProject(vec32* vec1, vec32* vec2) {
     vec1Squared = vec1Squared*vec1Squared;
     double projectionScalar = vec1DotVec2/vec1Squared;
     scalarMultiply(vec1Copy, projectionScalar);
-    free(vec1Copy);
     return vec1Copy;
 }
 
