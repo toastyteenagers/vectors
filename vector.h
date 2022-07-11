@@ -3,7 +3,7 @@
 #define arrLen(arr) (int)(sizeof(arr)/(sizeof(double)))
 
 typedef struct vec32 {
-    double **contents;
+    float_t **contents;
     int rows;
     int cols;
 } vec32;
@@ -164,8 +164,66 @@ vec32* vectorProject(vec32* vec1, vec32* vec2) {
     vec1Squared = vec1Squared*vec1Squared;
     double projectionScalar = vec1DotVec2/vec1Squared;
     scalarMultiply(vec1Copy, projectionScalar);
-
+    free(vec1Copy);
     return vec1Copy;
 }
-//cross product
-//determinant 
+
+static double detHelper(vec32* vec, vec32* copy, int n) {
+    double det = 0;
+    int32_t alternatingSign = 1;
+    
+    if (n ==2) {
+        return vec->contents[0][0]*vec->contents[1][1] - vec->contents[0][1]*vec->contents[1][0];
+    } else {
+        for (int i = 0; i < n; i++) {
+            int c1,c2;
+            c1 = c2 = 0;
+            for (int j = 0; j < n; j++) {
+                for (int k = 0; k < n; k++) {
+                    if (j != 0 && k != i) {
+                        copy->contents[c1][c2] = vec->contents[j][k];
+                        c2++;
+                        if (c2 > n-2) {
+                            c1++;  
+                            c2=0;
+                        }
+                    }
+                }
+            }
+            det += alternatingSign * (vec->contents[0][i]*detHelper(vec,copy,n-1));
+            alternatingSign *= -1;
+        }
+    }
+    return det;
+}
+
+double det(vec32* vec) {
+    if (vec->cols != vec->rows) {
+        fprintf(stderr,"Incompatible vectors\n");
+        exit(1);
+    } 
+    if (vec->cols > 15) {
+        fprintf(stderr,"Not advised to use det on large vectors, attempting anyway. \n");
+    }
+    vec32* copy = copyVec(vec);
+    double result = detHelper(vec,copy,vec->rows);
+    free(copy);
+    return result;
+}
+
+vec32* crossProduct3d(vec32* vec1, vec32* vec2) {
+    if (vec1->cols != 1 && vec2->cols != 1 && vec1->rows != 3 && vec2->cols != 3) {
+        fprintf(stderr,"Incompatible vectors\n");
+        exit(1);
+    }
+    vec32* retVec = initEmptyVec(3,1);
+    
+    //x  component
+    retVec->contents[0][0] = vec1->contents[0][1]*vec2->contents[0][2] - vec1->contents[0][2]*vec2->contents[0][1];
+    //y component
+    retVec->contents[0][1] = (-1)*(vec1->contents[0][0]*vec2->contents[0][2] - vec1->contents[0][2]*vec2->contents[0][0]);
+    //z component
+    retVec->contents[0][2] = vec1->contents[0][0]*vec2->contents[0][1] - vec1->contents[0][1]*vec2->contents[0][0];
+
+    return retVec;
+}   
